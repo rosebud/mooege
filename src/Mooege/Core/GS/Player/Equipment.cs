@@ -41,8 +41,10 @@ namespace Mooege.Core.GS.Player
             item.SetInventoryLocation(slot, 0, 0);
             if (slot == 4)
             {
-                _owner.Attributes[GameAttribute.Damage_Weapon_Min, 0] = item.Attributes[GameAttribute.Damage_Weapon_Min, 0];
-                _owner.Attributes[GameAttribute.Damage_Weapon_Delta, 0] = item.Attributes[GameAttribute.Damage_Weapon_Delta, 0];
+                _owner.Attributes[GameAttribute.Damage_Weapon_Min_Total_MainHand, 0] = item.Attributes[GameAttribute.Damage_Weapon_Min_Total, 0];
+                _owner.Attributes[GameAttribute.Damage_Weapon_Delta_Total_MainHand, 0] = item.Attributes[GameAttribute.Damage_Weapon_Delta_Total, 0];
+                _owner.Attributes[GameAttribute.Attacks_Per_Second_Item_MainHand] = item.Attributes[GameAttribute.Attacks_Per_Second_Item_Total];
+                _owner.Attributes[GameAttribute.Attacks_Per_Second_Item_Bonus] = item.Attributes[GameAttribute.Attacks_Per_Second_Item_Bonus];
                 _owner.RefreshStatistic();
 
             }
@@ -68,8 +70,10 @@ namespace Mooege.Core.GS.Player
                     item.Owner = null;
                     if (i == 4)
                     {
-                        _owner.Attributes[GameAttribute.Damage_Weapon_Min, 0] = 0;
-                        _owner.Attributes[GameAttribute.Damage_Weapon_Delta, 0] = 0;
+                        _owner.Attributes[GameAttribute.Damage_Weapon_Min_Total_MainHand, 0] = 0;
+                        _owner.Attributes[GameAttribute.Damage_Weapon_Delta_Total_MainHand, 0] = 0;
+                        _owner.Attributes[GameAttribute.Attacks_Per_Second_Item_MainHand] = 0;
+                        _owner.Attributes[GameAttribute.Attacks_Per_Second_Item_Bonus] = 0;
                         _owner.RefreshStatistic();
                     }
                     return i;

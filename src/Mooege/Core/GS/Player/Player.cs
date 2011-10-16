@@ -181,8 +181,13 @@ namespace Mooege.Core.GS.Player
             //Damage
             this.Attributes[GameAttribute.Damage_Min, 0] = 1f;   // hero minimal demage 
             this.Attributes[GameAttribute.Damage_Delta, 0] = 5f; // hero delta demage 
+            this.Attributes[GameAttribute.Damage_Bonus_Min, 0] = 0f; // hero min demage bonus 
+            this.Attributes[GameAttribute.Damage_Type_Percent_Bonus, 0] = 0f; // Procent bonus for specific type 
+           
+            
             this.Attributes[GameAttribute.Damage_Weapon_Min, 0] = 0f;  // weapon minimal demage
-            this.Attributes[GameAttribute.Damage_Weapon_Delta, 0] = 0f; // weapon delta demage            
+            this.Attributes[GameAttribute.Damage_Weapon_Delta, 0] = 0f; // weapon delta demage  
+          
             this.Attributes[GameAttribute.Damage_Min_Total, 0] = this.Attributes[GameAttribute.Damage_Min, 0] + this.Attributes[GameAttribute.Damage_Weapon_Min, 0];
             this.Attributes[GameAttribute.Damage_Delta_Total, 0] = this.Attributes[GameAttribute.Damage_Delta, 0] + this.Attributes[GameAttribute.Damage_Weapon_Delta, 0]; 
             //
@@ -231,7 +236,23 @@ namespace Mooege.Core.GS.Player
             this.Attributes[GameAttribute.Damage_Weapon_Delta_Total_MainHand, 0] = 2f;
             this.Attributes[GameAttribute.Damage_Weapon_Max, 0] = 3f;
             this.Attributes[GameAttribute.Damage_Weapon_Max_Total, 0] = 3f;
-
+            
+            // Attacks per second 
+            this.Attributes[GameAttribute.Attacks_Per_Second] = 1f; // basic attack per second
+            this.Attributes[GameAttribute.Attacks_Per_Second_Bonus] = 0f; // basic attack per second bonus
+            this.Attributes[GameAttribute.Attacks_Per_Second_Percent] = 0f; // basic attack per second percent bonus 
+            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Bonus] = 0f;
+            this.Attributes[GameAttribute.Attacks_Per_Second_Total] = 1f;
+            
+            
+            //this.Attributes[GameAttribute.Attacks_Per_Second_Item_CurrentHand] = 0f;
+            //this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total_MainHand] = 0f;
+            //this.Attributes[GameAttribute.Attacks_Per_Second_Total] = 0f;
+            
+            //this.Attributes[GameAttribute.Attacks_Per_Second_Item_MainHand] = 1.199219f;
+            //this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total] = 1.199219f;
+            //this.Attributes[GameAttribute.Attacks_Per_Second_Item_Subtotal] = 3.051758E-05f;
+            //this.Attributes[GameAttribute.Attacks_Per_Second_Item] = 3.051758E-05f;
             //Bonus stats
             this.Attributes[GameAttribute.Get_Hit_Recovery] = 6f;
             this.Attributes[GameAttribute.Get_Hit_Recovery_Per_Level] = 1f;
@@ -241,14 +262,7 @@ namespace Mooege.Core.GS.Player
             this.Attributes[GameAttribute.Get_Hit_Max_Base] = 50f;
             this.Attributes[GameAttribute.Hit_Chance] = 1f;
             this.Attributes[GameAttribute.Dodge_Rating_Total] = 3.051758E-05f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_CurrentHand] = 1.199219f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total_MainHand] = 1.199219f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Total] = 1.199219f;
-            this.Attributes[GameAttribute.Attacks_Per_Second] = 1f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_MainHand] = 1.199219f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Total] = 1.199219f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item_Subtotal] = 3.051758E-05f;
-            this.Attributes[GameAttribute.Attacks_Per_Second_Item] = 3.051758E-05f;
+            
             this.Attributes[GameAttribute.Crit_Percent_Cap] = 0x3F400000;
             this.Attributes[GameAttribute.Casting_Speed_Total] = 1f;
             this.Attributes[GameAttribute.Casting_Speed] = 1f;
@@ -323,12 +337,20 @@ namespace Mooege.Core.GS.Player
         public void RefreshStatistic()
         {
             var attribs = new GameAttributeMap();
-            
-            this.Attributes[GameAttribute.Damage_Min_Total, 0] = this.Attributes[GameAttribute.Damage_Min, 0] + this.Attributes[GameAttribute.Damage_Weapon_Min, 0];
-            this.Attributes[GameAttribute.Damage_Delta_Total, 0] = this.Attributes[GameAttribute.Damage_Delta, 0] + this.Attributes[GameAttribute.Damage_Weapon_Delta, 0];
-        
+            // min demage
+            this.Attributes[GameAttribute.Damage_Weapon_Min_Total_CurrentHand, 0] = this.Attributes[GameAttribute.Damage_Weapon_Min_Total_MainHand, 0];// only main hand "(DualWield_Hand#NONE ? Damage_Weapon_Min_Total_OffHand : Damage_Weapon_Min_Total_MainHand)"
+            this.Attributes[GameAttribute.Damage_Min_Subtotal, 0] = this.Attributes[GameAttribute.Damage_Min, 0] + this.Attributes[GameAttribute.Damage_Bonus_Min, 0] + this.Attributes[GameAttribute.Damage_Weapon_Min_Total_CurrentHand, 0];
+            this.Attributes[GameAttribute.Damage_Min_Total, 0] = this.Attributes[GameAttribute.Damage_Min_Subtotal, 0] + this.Attributes[GameAttribute.Damage_Type_Percent_Bonus, 0] * this.Attributes[GameAttribute.Damage_Min_Subtotal, 0];
+            // delta demage
+            this.Attributes[GameAttribute.Damage_Weapon_Delta_Total_CurrentHand, 0] = this.Attributes[GameAttribute.Damage_Weapon_Delta_Total_MainHand, 0];// only main hand "(DualWield_Hand#NONE ? Damage_Weapon_Min_Total_OffHand : Damage_Weapon_Min_Total_MainHand)"
+            this.Attributes[GameAttribute.Damage_Delta_Total, 0] = Math.Max(this.Attributes[GameAttribute.Damage_Delta, 0] - this.Attributes[GameAttribute.Damage_Bonus_Min, 0] + this.Attributes[GameAttribute.Damage_Weapon_Delta_Total_CurrentHand, 0], 0);
+            // attack speed hack
+            this.Attributes[GameAttribute.Attacks_Per_Second_Item_CurrentHand] = this.Attributes[GameAttribute.Attacks_Per_Second_Item_MainHand]; 
+            this.Attributes[GameAttribute.Attacks_Per_Second_Total] = this.Attributes[GameAttribute.Attacks_Per_Second_Item_CurrentHand];     
+                          
             attribs[GameAttribute.Damage_Min_Total, 0] = this.Attributes[GameAttribute.Damage_Min_Total, 0];
             attribs[GameAttribute.Damage_Delta_Total, 0] = this.Attributes[GameAttribute.Damage_Delta_Total, 0];
+            attribs[GameAttribute.Attacks_Per_Second_Total] = this.Attributes[GameAttribute.Attacks_Per_Second_Total];
             attribs.SendMessage(InGameClient, DynamicID);
         }
 
