@@ -38,7 +38,14 @@ namespace Mooege.Core.GS.Player
         {
             _equipment[slot] = item.DynamicID;
             item.Owner = _owner;
-            item.SetInventoryLocation(slot, 0, 0);            
+            item.SetInventoryLocation(slot, 0, 0);
+            if (slot == 4)
+            {
+                _owner.Attributes[GameAttribute.Damage_Weapon_Min, 0] = item.Attributes[GameAttribute.Damage_Weapon_Min, 0];
+                _owner.Attributes[GameAttribute.Damage_Weapon_Delta, 0] = item.Attributes[GameAttribute.Damage_Weapon_Delta, 0];
+                _owner.RefreshStatistic();
+
+            }
         }
 
         public void EquipItem(uint itemID, int slot)
@@ -59,6 +66,12 @@ namespace Mooege.Core.GS.Player
                     _equipment[i] = 0;
                     item.SetInventoryLocation(-1, -1, -1);
                     item.Owner = null;
+                    if (i == 4)
+                    {
+                        _owner.Attributes[GameAttribute.Damage_Weapon_Min, 0] = 0;
+                        _owner.Attributes[GameAttribute.Damage_Weapon_Delta, 0] = 0;
+                        _owner.RefreshStatistic();
+                    }
                     return i;
                 }
             }

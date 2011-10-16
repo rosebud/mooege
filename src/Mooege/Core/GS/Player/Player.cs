@@ -179,14 +179,19 @@ namespace Mooege.Core.GS.Player
             this.Attributes[GameAttribute.Resistance_Total, 0x226] = 0.5f;
 
             //Damage
-            this.Attributes[GameAttribute.Damage_Delta_Total, 0] = 2f;
+            this.Attributes[GameAttribute.Damage_Min, 0] = 1f;   // hero minimal demage 
+            this.Attributes[GameAttribute.Damage_Delta, 0] = 5f; // hero delta demage 
+            this.Attributes[GameAttribute.Damage_Weapon_Min, 0] = 0f;  // weapon minimal demage
+            this.Attributes[GameAttribute.Damage_Weapon_Delta, 0] = 0f; // weapon delta demage            
+            this.Attributes[GameAttribute.Damage_Min_Total, 0] = this.Attributes[GameAttribute.Damage_Min, 0] + this.Attributes[GameAttribute.Damage_Weapon_Min, 0];
+            this.Attributes[GameAttribute.Damage_Delta_Total, 0] = this.Attributes[GameAttribute.Damage_Delta, 0] + this.Attributes[GameAttribute.Damage_Weapon_Delta, 0]; 
+            //
             this.Attributes[GameAttribute.Damage_Delta_Total, 1] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Delta_Total, 2] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Delta_Total, 3] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Delta_Total, 4] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Delta_Total, 5] = 3.051758E-05f;
-            this.Attributes[GameAttribute.Damage_Delta_Total, 6] = 3.051758E-05f;
-            this.Attributes[GameAttribute.Damage_Min_Total, 0] = 2f;
+            this.Attributes[GameAttribute.Damage_Delta_Total, 6] = 3.051758E-05f;           
             this.Attributes[GameAttribute.Damage_Min_Total, 1] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Min_Total, 2] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Min_Total, 3] = 3.051758E-05f;
@@ -208,13 +213,11 @@ namespace Mooege.Core.GS.Player
             this.Attributes[GameAttribute.Damage_Weapon_Min_Total_CurrentHand, 3] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Weapon_Min_Total_CurrentHand, 4] = 3.051758E-05f;
             this.Attributes[GameAttribute.Damage_Weapon_Min_Total_CurrentHand, 5] = 3.051758E-05f;
-            this.Attributes[GameAttribute.Damage_Weapon_Min_Total_CurrentHand, 6] = 3.051758E-05f;
-            this.Attributes[GameAttribute.Damage_Weapon_Min, 0] = 2f;
+            this.Attributes[GameAttribute.Damage_Weapon_Min_Total_CurrentHand, 6] = 3.051758E-05f;     
             this.Attributes[GameAttribute.Damage_Weapon_Min_Total, 0] = 2f;
             this.Attributes[GameAttribute.Damage_Weapon_Min_Total_All] = 2f;
             this.Attributes[GameAttribute.Damage_Weapon_Min_Total_MainHand, 0] = 2f;
-            this.Attributes[GameAttribute.Damage_Weapon_Min_Total_CurrentHand, 0xFFFFF] = 3.051758E-05f;
-            this.Attributes[GameAttribute.Damage_Weapon_Delta, 0] = 2f;
+            this.Attributes[GameAttribute.Damage_Weapon_Min_Total_CurrentHand, 0xFFFFF] = 3.051758E-05f;  
             this.Attributes[GameAttribute.Damage_Weapon_Delta_SubTotal, 0] = 2f;
             this.Attributes[GameAttribute.Damage_Weapon_Delta_Total_CurrentHand, 0] = 2f;
             this.Attributes[GameAttribute.Damage_Weapon_Delta_Total_CurrentHand, 1] = 3.051758E-05f;
@@ -314,6 +317,19 @@ namespace Mooege.Core.GS.Player
             this.Attributes[GameAttribute.Backpack_Slots] = 60;
             this.Attributes[GameAttribute.General_Cooldown] = 0;
             #endregion // Attributes
+        }
+
+        // simple static reresh 
+        public void RefreshStatistic()
+        {
+            var attribs = new GameAttributeMap();
+            
+            this.Attributes[GameAttribute.Damage_Min_Total, 0] = this.Attributes[GameAttribute.Damage_Min, 0] + this.Attributes[GameAttribute.Damage_Weapon_Min, 0];
+            this.Attributes[GameAttribute.Damage_Delta_Total, 0] = this.Attributes[GameAttribute.Damage_Delta, 0] + this.Attributes[GameAttribute.Damage_Weapon_Delta, 0];
+        
+            attribs[GameAttribute.Damage_Min_Total, 0] = this.Attributes[GameAttribute.Damage_Min_Total, 0];
+            attribs[GameAttribute.Damage_Delta_Total, 0] = this.Attributes[GameAttribute.Damage_Delta_Total, 0];
+            attribs.SendMessage(InGameClient, DynamicID);
         }
 
         public void Consume(GameClient client, GameMessage message)

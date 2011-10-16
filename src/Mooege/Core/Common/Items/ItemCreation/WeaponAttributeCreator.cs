@@ -29,14 +29,14 @@ namespace Mooege.Core.Common.Items.ItemCreation
             item.Attributes[GameAttribute.Skill, 0x7780] = 1;
             item.Attributes[GameAttribute.IdentifyCost] = 1;
        
-            const float heroAttackspeed = 1.2f; // musst be calculated by Skills + passives + affixes  + ...
-            const float heroMaxDmg = 50f; // musst be calculated by Skills + passives + affixes  + ...
-            const float heroMinDmg = 10f; // musst be calculated by Skills + passives + affixes  + ...
+            const float heroAttackspeed = 1f; // musst be calculated by Skills + passives + affixes  + ...
+            const float heroMaxDmg = 0f; // musst be calculated by Skills + passives + affixes  + ...
+            const float heroMinDmg = 0f; // musst be calculated by Skills + passives + affixes  + ...
             const float offhandMultiplier = 0.8f;
 
-            var weaponDmg = (float)(RandomHelper.NextDouble() * 100) + 10;
-            var attackspeed = (float)(RandomHelper.NextDouble() + 0.5);
-            var minWeaponDmg = weaponDmg - ((float)(RandomHelper.NextDouble() * 20) + 10);
+            var weaponDmg = RandomHelper.Next(5) + 5;
+            var attackspeed = 1f;
+            var minWeaponDmg = weaponDmg - RandomHelper.Next(5) + 1;
 
             item.Attributes[GameAttribute.Attacks_Per_Second_Total] = attackspeed * heroAttackspeed;
             item.Attributes[GameAttribute.Attacks_Per_Second_Item] = attackspeed;
