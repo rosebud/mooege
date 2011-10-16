@@ -98,7 +98,14 @@ namespace Mooege.Core.GS.Actors
 
         public override void OnTargeted(Mooege.Core.GS.Player.Player player, TargetMessage message)
         {
-            this.Die(player);
+            this.Hit(player);
+            if (this.Attributes[GameAttribute.Hitpoints_Cur] <= 0)
+            {
+                this.Die(player);
+                this.World.SpawnRandomDrop(player, this.Position);
+                this.World.SpawnGold(player, this.Position);
+                this.Destroy();
+            }
         }
 
         public override bool Reveal(Mooege.Core.GS.Player.Player player)
@@ -126,6 +133,39 @@ namespace Mooege.Core.GS.Actors
             });
 
             return true;
+        }
+
+        public void Hit(Mooege.Core.GS.Player.Player player)
+        {
+            // hit value 1 hit point ....
+            var demage = RandomHelper.Next((int)player.Attributes[GameAttribute.Damage_Min_Total, 0], (int)(player.Attributes[GameAttribute.Damage_Min_Total, 0] + player.Attributes[GameAttribute.Damage_Delta_Total, 0]));
+            this.Attributes[GameAttribute.Hitpoints_Cur] -= demage;
+            //
+            this.World.BroadcastIfRevealed(new PlayHitEffectMessage()
+            {
+                ActorID = this.DynamicID,
+                HitDealer = player.DynamicID,
+                Field2 = 0x0, // 0x0 - standard ,0x1 - explode, 0x2 - lighting, 0x3 - ice,0x4 - poison
+                Field3 = true,
+            }, this);
+
+            this.World.BroadcastIfRevealed(new FloatingNumberMessage()
+            {
+                ActorID = this.DynamicID,
+                Number = demage,
+                Type = FloatingNumberMessage.FloatType.White,
+            }, this);
+
+            GameAttributeMap attribs = new GameAttributeMap();
+            attribs[GameAttribute.Hitpoints_Cur] = this.Attributes[GameAttribute.Hitpoints_Cur];
+
+            foreach (var msg in attribs.GetMessageList(this.DynamicID))
+                this.World.BroadcastIfRevealed(msg, this);
+
+            this.World.BroadcastIfRevealed(new ANNDataMessage(Opcodes.ANNDataMessage13)
+            {
+                ActorID = this.DynamicID
+            }, this);
         }
 
         // FIXME: Hardcoded hell. /komiga
@@ -164,20 +204,6 @@ namespace Mooege.Core.GS.Actors
                 ActorID = this.DynamicID,
                 Field1 = 0xc,
             }, this);
-            this.World.BroadcastIfRevealed(new PlayHitEffectMessage()
-            {
-                ActorID = this.DynamicID,
-                HitDealer = player.DynamicID,
-                Field2 = 0x2,
-                Field3 = false,
-            }, this);
-
-            this.World.BroadcastIfRevealed(new FloatingNumberMessage()
-            {
-                ActorID = this.DynamicID,
-                Number = 9001.0f,
-                Type = FloatingNumberMessage.FloatType.White,
-            }, this);
 
             this.World.BroadcastIfRevealed(new ANNDataMessage(Opcodes.ANNDataMessage13)
             {
@@ -206,6 +232,7 @@ namespace Mooege.Core.GS.Actors
                 ActorID = this.DynamicID,
             }, this);
 
+
             GameAttributeMap attribs = new GameAttributeMap();
             attribs[GameAttribute.Hitpoints_Cur] = 0f;
             attribs[GameAttribute.Could_Have_Ragdolled] = true;
@@ -231,10 +258,6 @@ namespace Mooege.Core.GS.Actors
                 Field2 = 0x2,
                 Field3 = false,
             }, this);
-
-            this.World.SpawnRandomDrop(player, this.Position);
-            this.World.SpawnGold(player, this.Position);
-            this.Destroy();
         }
     }
 }
